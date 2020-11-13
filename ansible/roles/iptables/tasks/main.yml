@@ -1,0 +1,111 @@
+---
+- name: Installation
+  apt:
+    name: iptables 
+    state: latest
+    update_cache: yes
+
+- name: Localhost (1/2)
+  iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
+- name: Localhost (2/2)
+  iptables:
+    chain: OUTPUT
+    out_interface: lo
+    jump: ACCEPT
+
+- name: DNS input
+  iptables:
+    chain: INPUT
+    protocol: "{{ item }}"
+    source_port: "53"
+    ctstate: ESTABLISHED
+    jump: ACCEPT
+  with_items: ['udp', 'tcp']
+
+- name: DNS output
+  iptables:
+    chain: OUTPUT
+    protocol: "{{ item }}"
+    destination_port: "53"
+    ctstate: NEW,ESTABLISHED
+    jump: ACCEPT
+  with_items: ['udp', 'tcp']
+
+- name: SSH input
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "2222"
+    ctstate: NEW,ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: SSH output
+  iptables:
+    chain: OUTPUT
+    protocol: tcp
+    source_port: "2222"
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Apache input
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    ctstate: NEW,ESTABLISHED,RELATED
+    jump: ACCEPT
+  with_items: ['80', '443']
+
+- name: Apache output
+  iptables:
+    chain: OUTPUT
+    protocol: tcp
+    source_port: "{{ item }}"
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  with_items: ['80', '443']
+
+- name: HTTP(S) output
+  iptables:
+    chain: OUTPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    ctstate: NEW,ESTABLISHED,RELATED
+    jump: ACCEPT
+  with_items: ['80', '443']
+
+- name: HTTP(S) input
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    source_port: "{{ item }}"
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  with_items: ['80', '443']
+
+- name: Log
+  iptables:
+    chain: "{{ item }}"
+    jump: LOG
+  with_items: ['INPUT', 'FORWARD', 'OUTPUT']
+
+- name: Policy
+  iptables:
+    chain: "{{ item }}"
+    policy: DROP
+  with_items: ['INPUT', 'OUTPUT', 'FORWARD']
+
+- name: Install iptables-persistent
+  apt:
+    name: iptables-persistent 
+    state: latest
+    update_cache: yes
+
+- name: Make iptables configuration persistent
+  shell: iptables-save -f "{{ item }}"
+  with_items: ['/etc/iptables/rules.v4', '/etc/iptables/rules.v6']
+...

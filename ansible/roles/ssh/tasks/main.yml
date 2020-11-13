@@ -1,0 +1,38 @@
+---
+- name: Deactivate root login
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#PermitRootLogin'
+    line: 'PermitRootLogin no'
+    state: present
+  notify: restart ssh
+
+- name: Activate public key authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#PubkeyAuthentication yes$'
+    line: 'PubkeyAuthentication yes'
+    state: present
+  notify: restart ssh
+
+- name: Deactivate password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#PasswordAuthentication yes$'
+    line: 'PasswordAuthentication no'
+    state: present
+  notify: restart ssh
+
+- name: Change the default SSH port
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#Port 22$'
+    line: 'Port 2222'
+    state: present
+  notify: restart ssh
+
+- meta: flush_handlers #Run the "restart ssh" handler now
+
+- name: Set inventory ansible_port to 2222
+  set_fact:
+    ansible_port: "{{ configured_port }}"

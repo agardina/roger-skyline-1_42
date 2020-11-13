@@ -1,0 +1,41 @@
+---
+- name: Install OpenSSL
+  apt:
+    name: 'python-cryptography'
+    state: latest
+    update_cache: yes
+
+- name: Generate an encrypted private key #openssl genrsa -des3 -out server.key 2048
+  community.crypto.openssl_privatekey:
+    path: server.key
+    type: RSA
+    size: 2048
+
+- name: Generate a Certificate Signing Request #openssl req -new -key server.key -out server.csr
+  community.crypto.openssl_csr:
+    path: server.csr
+    privatekey_path: server.key
+    common_name: www.mon-site.com
+    country_name: FR
+    locality_name: Paris
+    organization_name: MonSite
+
+- name: Generate the autosigned OpenSSL certificate #openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+  community.crypto.x509_certificate:
+    path: server.crt
+    privatekey_path: server.key
+    csr_path: server.csr
+    entrust_not_after: "+365d"
+    provider: selfsigned
+
+- name: Install the certificate (1/2) #sudo cp server.crt /etc/ssl/certs
+  shell: cp server.crt /etc/ssl/certs/server.crt
+
+- name: Install the certificate (2/2) #sudo cp server.key /etc/ssl/private
+  shell: cp server.key /etc/ssl/private/server.key
+
+- name: Remove files
+  shell: rm server*
+  args:
+    warn: false
+...

@@ -1,0 +1,12 @@
+---
+- name: Installation
+  apt:
+    name: zsh 
+    state: latest
+    update_cache: yes
+
+- name: Change default shell
+  user:
+    name: agardina
+    shell: /bin/zsh
+...

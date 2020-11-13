@@ -1,0 +1,40 @@
+---
+- name: Installation
+  apt:
+    name: apache2 
+    state: latest
+    update_cache: yes
+
+- name: Modify log format of the file other_vhosts_access.log
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    regexp: '^LogFormat* vhost_combined'
+    line: 'LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" vhost_combined'
+    state: present
+  notify: reload apache2
+
+- name: Apache security configuration
+  include: security.yml
+  notify: reload apache2
+
+- name: Deactivate default sites
+  command: a2dissite {{ item }}
+  with_items: ['000-default.conf', 'default-ssl.conf']
+  notify: reload apache2
+
+- name: Website deployment
+  include: website_deployment.yml
+  notify: reload apache2
+
+- name: Configure SSL
+  include: ssl.yml
+  notify: reload apache2
+
+- name: Active the SSL module
+  command: a2enmod ssl
+  notify: reload apache2
+
+- name: Activate the new site
+  command: a2ensite mon-site
+  notify: reload apache2
+...

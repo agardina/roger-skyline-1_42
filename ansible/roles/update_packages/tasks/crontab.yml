@@ -1,0 +1,32 @@
+---
+- name: Modify the file /etc/crontab (1/3)
+  cron:
+    cron_file: "/etc/crontab"
+    name: "Update packages weekly"
+    weekday: '1'
+    hour: '4'
+    minute: '0'
+    user: root
+    job: '/home/agardina/update.sh'
+
+- name: Modify the file /etc/crontab (2/3)
+  cron:
+    cron_file: "/etc/crontab"
+    name: "Update packages at reboot"
+    special_time: reboot
+    user: root
+    job: '/home/agardina/update.sh'
+
+- name: Modify the file /etc/crontab (3/3)
+  cron:
+    cron_file: "/etc/crontab"
+    name: "/etc/crontab logs"
+    weekday: "*"
+    hour: "0"
+    minute: "0"
+    user: root
+    job: "/home/agardina/crontab_modifications.sh"
+
+- name: Copy the file /etc/crontab
+  shell: cp /etc/crontab /home/agardina/crontab_tmp
+...

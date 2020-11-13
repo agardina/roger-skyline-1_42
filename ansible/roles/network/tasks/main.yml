@@ -1,0 +1,26 @@
+---
+- name: Get IP address
+  shell: ip -f inet addr | grep "inet" | grep -v "127.0.0.1" | awk '{print $2}' | cut -f 1 -d "/"
+  register: ip_address
+
+# - name: Get gateway
+#   shell: ip route | grep "default" | cut -f 3 -d " "
+#   register: gateway_address
+
+- name: Network configuration (1/3)
+  template:
+    src: ../templates/interfaces
+    dest: /etc/network/interfaces
+    force: yes
+
+- name: Network configuration (2/3)
+  copy:
+    src: ../files/70-disable-ipv6.conf
+    dest: /etc/sysctl.d/70-disable-ipv6.conf
+
+- name: Network configuration (3/3)
+  shell: sysctl -p -f /etc/sysctl.d/70-disable-ipv6.conf
+
+- name: Reboot host
+  reboot:
+...

@@ -1,0 +1,13 @@
+---
+- name: Create script for updating packages ang log updates
+  copy:
+    src: ../files/update.sh
+    dest: /home/agardina/update.sh
+    mode: '0755'
+
+- name: Create script for logging /etc/crontab modifications and sending mail to root
+  copy:
+    src: ../files/crontab_modifications.sh
+    dest: /home/agardina/crontab_modifications.sh
+    mode: '0755'
+...

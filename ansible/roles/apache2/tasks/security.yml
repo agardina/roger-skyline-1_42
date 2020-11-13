@@ -1,0 +1,33 @@
+---
+- name: ServerSignature Off (1/2)
+  become: yes
+  lineinfile: 
+    path: /etc/apache2/conf-available/security.conf
+    regexp: 'ServerSignature On'
+    state: absent
+  notify: reload apache2
+
+- name: ServerSignature Off (2/2)
+  become: yes
+  lineinfile: 
+    path: /etc/apache2/conf-available/security.conf
+    regexp: '#ServerSignature Off'
+    line: 'ServerSignature Off'
+  notify: reload apache2
+
+- name: ServerTokens Prod
+  become: yes
+  lineinfile: 
+    path: /etc/apache2/conf-available/security.conf
+    regexp: 'ServerTokens OS'
+    line: 'ServerTokens Prod'
+  notify: reload apache2
+
+- name: Deactivate Indexes options
+  become: yes
+  lineinfile: 
+    path: /etc/apache2/apache2.conf
+    regexp: 'Options Indexes FollowSymLinks'
+    line: 'Options FollowSymLinks'
+  notify: reload apache2
+...

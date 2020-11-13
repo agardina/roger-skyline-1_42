@@ -1,0 +1,24 @@
+---
+- name: Configuration du serveur
+  hosts: web
+  remote_user: agardina
+  become: yes
+  vars:
+    git_repository: "https://github.com/agardina/rs1-website.git"
+    gateway_address: "192.168.1.254"
+    broadcast_address: "192.168.1.51"
+  gather_facts: no #Deactivate the "Gathering Facts" task in order to let the "find_ssh_port" role run correctly. We will activate it at the end of this very role.
+
+  roles:
+    - find_ssh_port
+    - zsh
+    - ssh
+    - apache2
+    - website_deployment
+    - psad
+    - iptables
+    - fail2ban
+    - useless_services
+    - update_packages
+    - network
+...

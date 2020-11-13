@@ -1,0 +1,34 @@
+---
+- name: Installation
+  apt:
+    name: psad 
+    state: latest
+    update_cache: yes
+
+- name: Configure psad (1/3)
+  lineinfile:
+    path: /etc/psad/psad.conf
+    regexp: '^HOSTNAME\s+_CHANGEME_;$'
+    line: 'HOSTNAME     debian;'
+    state: present
+  notify: restart psad
+
+- name: Configure psad (2/3)
+  lineinfile:
+    path: /etc/psad/psad.conf
+    regexp: '^ENABLE_AUTO_IDS\s+N;$'
+    line: 'ENABLE_AUTO_IDS        Y;'
+  notify: restart psad
+
+- name: Configure psad (3/3)
+  lineinfile:
+    path: /etc/psad/psad.conf
+    regexp: '^AUTO_IDS_DANGER_LEVEL\s+5;$'
+    line: 'AUTO_IDS_DANGER_LEVEL       3;'
+
+- name: Update psad
+  shell: psad --sig-update
+  notify: restart psad
+
+- meta: flush_handlers
+...

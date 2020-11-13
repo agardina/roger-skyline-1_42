@@ -1,0 +1,27 @@
+---
+- name: Virtualhost configuration
+  template:
+    src: ../files/mon-site.conf
+    dest: "/etc/apache2/sites-available/mon-site.conf"
+  notify: reload apache2
+
+- name: Document root
+  file:
+    path: /var/www/html/mon-site
+    state: directory
+    mode: '0755'
+  notify: reload apache2
+
+- name: Install the latest passlib version
+  apt:
+    name: python-passlib 
+    state: latest
+    update_cache: yes
+
+- name: Create password file
+  community.general.htpasswd:
+    create: yes
+    path: /etc/apache2/passwords
+    name: root
+    password: root
+...

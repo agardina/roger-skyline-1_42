@@ -1,0 +1,9 @@
+---
+- name: Stop useless services
+  service: name="{{ item }}" state=stopped
+  with_items: ['console-setup.service', 'keyboard-setup.service']
+
+- name: Disable useless services
+  service: name="{{ item }}" enabled=no
+  with_items: ['console-setup.service', 'keyboard-setup.service']
+...

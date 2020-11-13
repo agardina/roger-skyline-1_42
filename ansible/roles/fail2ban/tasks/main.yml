@@ -1,0 +1,21 @@
+---
+- name: Installation
+  apt:
+    name: fail2ban 
+    state: latest
+    update_cache: yes
+
+- name: Create the file jail.local
+  copy:
+    src: ../files/jail.local
+    dest: /etc/fail2ban/jail.local
+  notify: restart fail2ban
+
+- name: Create the filter apache-dos
+  copy:
+    src: ../files/apache-dos.conf
+    dest: /etc/fail2ban/filter.d/apache-dos.conf
+  notify: restart fail2ban
+
+- meta: flush_handlers
+...

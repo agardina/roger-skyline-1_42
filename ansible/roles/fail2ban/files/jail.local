@@ -1,0 +1,53 @@
+[DEFAULT]
+ignoreip = 127.0.0.1/8
+bantime  = 604800
+# A host is banned if it has generated "maxretry" during the last "findtime" seconds.
+findtime = 300
+maxretry = 3
+
+#Block the failed login attempts on the SSH server.
+[sshd]
+port = 2222
+enabled = true
+maxretry = 5
+findtime = 60
+bantime = 60
+ignoreip = 192.168.1.202
+
+#Detect password authentication failures
+[apache-auth]
+enabled = true
+port    = http,https
+filter  = apache-auth
+logpath = /var/log/apache*/*error.log
+maxretry = 6
+
+#Stop DOS attack from remote host. 
+[apache-dos]
+enabled = true
+port = http,https
+filter = apache-dos
+logpath = /var/log/apache2/*access.log
+maxretry = 100
+findtime = 300
+bantime = 300
+
+#Block the remote host that is trying to search for scripts on the website to execute.
+[apache-noscript]
+enabled = true
+
+#Block the remote host that is trying to request suspicious URLs.
+[apache-overflows]
+enabled  = true
+port     = http,https
+filter   = apache-overflows
+logpath  = /var/log/apache2*/*.log
+maxretry = 2
+
+#Block the remote host that is trying to request malicious bot.
+[apache-badbots]
+enabled  = true
+port     = http,https
+filter   = apache-badbots
+logpath  = /var/log/apache2*/*.log
+maxretry = 2
